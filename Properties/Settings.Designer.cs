@@ -49,7 +49,7 @@ namespace LYV.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
         [global::System.Configuration.DefaultSettingValueAttribute("Data Source=192.168.23.11;Initial Catalog=UOF;Persist Security Info=True;User ID=" +
-            "trinhky;Password=It@123; Max Pool Size=300")]
+            "trinhky;Password=It@123; Max Pool Size=301")]
         public string UOF {
             get {
                 return ((string)(this["UOF"]));

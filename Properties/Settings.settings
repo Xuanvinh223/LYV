@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Training.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="LYV.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="UOF1014ConnectionString" Type="(Connection string)" Scope="Application">
@@ -21,9 +21,9 @@
     <Setting Name="UOF" Type="(Connection string)" Scope="Application">
       <DesignTimeValue Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
 &lt;SerializableConnectionString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
-  &lt;ConnectionString&gt;Data Source=192.168.23.11;Initial Catalog=UOF;Persist Security Info=True;User ID=trinhky;Password=It@123; Max Pool Size=300&lt;/ConnectionString&gt;
+  &lt;ConnectionString&gt;Data Source=192.168.23.11;Initial Catalog=UOF;Persist Security Info=True;User ID=trinhky;Password=It@123; Max Pool Size=301&lt;/ConnectionString&gt;
 &lt;/SerializableConnectionString&gt;</DesignTimeValue>
-      <Value Profile="(Default)">Data Source=192.168.23.11;Initial Catalog=UOF;Persist Security Info=True;User ID=trinhky;Password=It@123; Max Pool Size=300</Value>
+      <Value Profile="(Default)">Data Source=192.168.23.11;Initial Catalog=UOF;Persist Security Info=True;User ID=trinhky;Password=It@123; Max Pool Size=301</Value>
     </Setting>
     <Setting Name="LYV_ERP" Type="(Connection string)" Scope="Application">
       <DesignTimeValue Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
