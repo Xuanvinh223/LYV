@@ -20,14 +20,13 @@ namespace LYV.Trigger.BusinessTrip
             BusinessTripUCO uco = new BusinessTripUCO();
             string SiteCode = applyTask.SiteCode;
             string signStatus = applyTask.SignResult.ToString();
-
             string LYV = applyTask.Task.CurrentDocument.Fields["LYV"].FieldValue.ToString();
+            string Area = applyTask.Task.CurrentDocument.Fields["Area"].FieldValue.ToString();
+            string MaPhieu = applyTask.Task.CurrentDocument.Fields["MaPhieu"].FieldValue.ToString();
             string EmployeeType = applyTask.Task.CurrentDocument.Fields["EmployeeType"].FieldValue.ToString();
-            string RequestDate = applyTask.Task.CurrentDocument.Fields["RequestDate"].FieldValue.ToString();
-            string Type = applyTask.Task.CurrentDocument.Fields["Type"].FieldValue.ToString();
             XElement xE = XElement.Parse(applyTask.Task.CurrentDocument.Fields["Form"].FieldValue.ToString());
 
-            uco.UpdateFormStatus(LYV, EmployeeType, RequestDate, Type, SiteCode, signStatus, xE);
+            uco.UpdateFormStatus(LYV, Area, MaPhieu, EmployeeType, SiteCode, signStatus, xE);
             return "";
         }
 

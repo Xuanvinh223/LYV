@@ -131,6 +131,9 @@
   <ItemGroup>
     <Folder Include="bin\Debug\zh-Hant\" />
     <Folder Include="bin\Release\" />
+    <Folder Include="PO\" />
+    <Folder Include="Trigger\" />
+    <Folder Include="UCO\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="bin\Debug\AngleSharp.Css.dll" />
@@ -221,6 +224,7 @@
     <Content Include="bin\Debug\Training.dll" />
     <Content Include="bin\Debug\Training.pdb" />
     <Content Include="bin\Debug\zxing.dll" />
+    <Content Include="LYV.sln" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Plugin\Report\BusinessTripNN.rpt">

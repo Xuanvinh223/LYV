@@ -1,15 +1,15 @@
-﻿using System.Data;
-using System.Text.RegularExpressions;
+﻿using Ede.Uof.WKF.Utility;
+using System;
+using System.Data;
 using System.Xml.Linq;
 
-namespace LYV.BusinessTrip.PO
+namespace LYV.BusinessTripOD.PO
 {
-    internal class BusinessTripPO : Ede.Uof.Utility.Data.BasePersistentObject
+    internal class BusinessTripOD : Ede.Uof.Utility.Data.BasePersistentObject
     {
-        private string conn = Training.Properties.Settings.Default.UOF.ToString();
-        private string connectHRM = Training.Properties.Settings.Default.HRM.ToString();
         internal string GetLEV(string UserID, string groupID)
         {
+            string conn = Training.Properties.Settings.Default.UOF.ToString();
             this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(conn);
             string cmd = @"SELECT LEV 
                            FROM TB_EB_USER 
@@ -32,14 +32,11 @@ namespace LYV.BusinessTrip.PO
             return LEV;
 
         }
-
-        internal string GetMaPhieu(string Type)
+        internal string GetMaPhieu()
         {
+            string conn = Training.Properties.Settings.Default.UOF.ToString();
             this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(conn);
-            string cmd = "";
-            if (Type == "1")
-            {
-                cmd = @"DECLARE @NO VARCHAR(50) = ''
+            string cmd = @"DECLARE @NO VARCHAR(50) = ''
 
                           SELECT @NO=CONVERT(VARCHAR,YEAR(GETDATE()))+
                                      RIGHT('0' + CONVERT(VARCHAR,MONTH(GETDATE())), 2)+
@@ -47,30 +44,13 @@ namespace LYV.BusinessTrip.PO
 
                           SELECT CASE 
                                     WHEN MAX(MaPhieu) IS NOT NULL THEN 
-                                    'V' + CONVERT(VARCHAR, CONVERT(BIGINT, SUBSTRING(MAX(MaPhieu), 2, LEN(MAX(MaPhieu)))) + 1) 
+                                    'O' + CONVERT(VARCHAR, CONVERT(BIGINT, SUBSTRING(MAX(MaPhieu), 2, LEN(MAX(MaPhieu)))) + 1) 
                                     ELSE 
-                                    'V' + @NO + '001' 
+                                    'O' + @NO + '001' 
                                  END AS MaPhieu 
-                          FROM LYN_BusinessTrip
-                          WHERE MaPhieu LIKE 'V' + @NO + '%'";
-            }
-            else
-            {
-                cmd = @"DECLARE @NO VARCHAR(50) = ''
+                          FROM LYV_BusinessTripOD
 
-                          SELECT @NO=CONVERT(VARCHAR,YEAR(GETDATE()))+
-                                     RIGHT('0' + CONVERT(VARCHAR,MONTH(GETDATE())), 2)+
-                                     RIGHT('0' + CONVERT(VARCHAR,DAY(GETDATE())), 2)
-
-                          SELECT CASE 
-                                    WHEN MAX(MaPhieu) IS NOT NULL THEN 
-                                    'F' + CONVERT(VARCHAR, CONVERT(BIGINT, SUBSTRING(MAX(MaPhieu), 2, LEN(MAX(MaPhieu)))) + 1) 
-                                    ELSE 
-                                    'F' + @NO + '001' 
-                                 END AS MaPhieu 
-                          FROM LYN_BusinessTrip
-                          WHERE MaPhieu LIKE 'F' + @NO + '%'";
-            }
+                          WHERE MaPhieu LIKE 'O' + @NO + '%'";
 
             DataTable dt = new DataTable();
             dt.Load(this.m_db.ExecuteReader(cmd));
@@ -86,10 +66,10 @@ namespace LYV.BusinessTrip.PO
         }
         internal DataTable GetDep()
         {
-            this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(connectHRM);
+            string conn = Training.Properties.Settings.Default.HRM.ToString();
+            this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(conn);
             string cmdTxt = @"SELECT ST_NHANVIEN.DV_MA,DV_TEN
                             FROM ST_DONVI left JOIN dbo.ST_NHANVIEN ON ST_NHANVIEN.DV_MA = ST_DONVI.DV_MA";
-
             DataTable dt = new DataTable();
 
             dt.Load(this.m_db.ExecuteReader(cmdTxt));
@@ -100,7 +80,8 @@ namespace LYV.BusinessTrip.PO
         }
         internal string GetEmployee(string UserID)
         {
-            this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(connectHRM);
+            string conn = Training.Properties.Settings.Default.HRM.ToString();
+            this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(conn);
 
             DataTable dt = new DataTable();
             string Department = "";
@@ -128,7 +109,8 @@ namespace LYV.BusinessTrip.PO
                 }
                 else
                 {
-                    this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(connectHRM);
+                    string conn1 = Training.Properties.Settings.Default.HRM.ToString();
+                    this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(conn1);
                     DataTable dt1 = new DataTable();
 
                     string selectSql = @"
@@ -158,14 +140,14 @@ namespace LYV.BusinessTrip.PO
 
             return result;
         }
-        internal void InsertBusinessTripFormData(string LYV, string Area, string MaPhieu,string EmployeeType, string DepID, string UserID, XElement xE)
+        internal void InsertBusinessTripODFormData(string LYV, string Area, string MaPhieu,string EmployeeType, string DepID, string UserID, XElement xE)
         {
+            string conn = Training.Properties.Settings.Default.UOF.ToString();
             this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(conn);
 
+            string Name_ID = xE.Attribute("Name_ID").Value;
             string Expert = xE.Attribute("Expert").Value;
             string Factory = xE.Attribute("Factory").Value;
-            string Work = xE.Attribute("Work").Value;
-            string Name_ID = xE.Attribute("Name_ID").Value;
             string Name = xE.Attribute("Name").Value;
             string Name_DepID = xE.Attribute("Name_DepID").Value;
             string Name_DepName = xE.Attribute("Name_DepName").Value;
@@ -174,44 +156,42 @@ namespace LYV.BusinessTrip.PO
             string Purpose = xE.Attribute("Purpose").Value;
             string FLocation = xE.Attribute("FLocation").Value;
             string Journey = xE.Attribute("Journey").Value;
-            string BTime = xE.Attribute("BTime").Value;
+            string Time = xE.Attribute("Time").Value;
+            string STime = xE.Attribute("STime").Value;
             string ETime = xE.Attribute("ETime").Value;
             string Days = xE.Attribute("Days").Value;
             string TransportType = xE.Attribute("TransportType").Value;
             string ApplyCar = xE.Attribute("ApplyCar").Value;
             string Remark = xE.Attribute("Remark").Value;
-            string Departurejourney = xE.Attribute("Departurejourney").Value;
-            string Journeyends = xE.Attribute("Journeyends").Value;
 
-            string cmdTxt = @"  INSERT INTO LYV_BusinessTrip
-                                (	    [LYV_TDC],
-                                        [Area],
-                                        [MaPhieu],
-                                        [Expert],
-                                        [Factory],
-                                        [EmployeeType],
-                                        [Work]
-                                       ,[Name_ID]
-                                       ,[Name]
-                                       ,[Name_DepID]
-                                       ,[Name_DepName]
-                                       ,[Agent_ID]
-                                       ,[Agent]
-                                       ,[Purpose]
-                                       ,[FLocation]
-                                       ,[Journey]
-                                       ,[BTime]
-                                       ,[ETime]
-                                       ,[Days]
-                                       ,[TransportType]
-                                       ,[ApplyCar]
-                                       ,[Remark]
-                                       ,[Departurejourney]
-                                       ,[Journeyends]
-                                       ,[flowflag]
-                                       ,[USERID]
-                                       ,[DepID]
-                                       ,[USERDATE]) 
+            string cmdTxt = @"  INSERT INTO LYV_BusinessTripOD
+                                (	 [LYV_TSS],
+                                     [Area],
+                                     [MaPhieu],
+                                     [Expert],
+                                     [Factory],
+                                     [EmployeeType],
+                                     [Name_ID] ,
+                                     [Name] ,
+                                     [Name_DepID] ,
+                                     [Name_DepName] ,
+                                     [Agent_ID] ,
+                                     [Agent] ,
+                                     [Purpose] ,
+                                     [FLocation] ,
+                                     [Journey] ,
+                                     [Time] ,
+                                     [STime] ,
+                                     [ETime] ,
+                                     [Days] ,
+                                     [TransportType] ,
+                                     [ApplyCar] ,
+                                     [Remark] ,
+                                     [flowflag] ,  
+                                     [USERID] ,
+                                     [DepID] ,
+                                     [USERDATE] 
+                                ) 
                                  VALUES 
                                  (	
                                      @LYV,
@@ -220,7 +200,6 @@ namespace LYV.BusinessTrip.PO
                                      @Expert,
                                      @Factory,
                                      @EmployeeType,
-                                     @Work,
                                      @Name_ID,
                                      @Name,
                                      @Name_DepID,
@@ -230,14 +209,13 @@ namespace LYV.BusinessTrip.PO
                                      @Purpose,
                                      @FLocation,
                                      @Journey,
-                                     @BTime,
-                                     " + (string.IsNullOrEmpty(ETime) ? "NULL" : "@ETime") + @",
-                                     " + (string.IsNullOrEmpty(Days) ? "NULL" : "@Days") + @", 
+                                     @Time,
+                                     @STime,
+                                     @ETime,
+                                     @Days, 
                                      " + (string.IsNullOrEmpty(TransportType) ? "NULL" : "@TransportType") + @", 
                                      @ApplyCar,
                                      @Remark,
-                                     @Departurejourney,
-                                     @Journeyends,
                                      @flowflag,
                                      @USERID,
                                      @DepID,
@@ -250,7 +228,6 @@ namespace LYV.BusinessTrip.PO
             this.m_db.AddParameter("@Expert", Expert);
             this.m_db.AddParameter("@Factory", Factory);
             this.m_db.AddParameter("@EmployeeType", EmployeeType);
-            this.m_db.AddParameter("@Work", Work);
             this.m_db.AddParameter("@Name_ID", Name_ID);
             this.m_db.AddParameter("@Name", Name);
             this.m_db.AddParameter("@Name_DepID", Name_DepID);
@@ -260,14 +237,13 @@ namespace LYV.BusinessTrip.PO
             this.m_db.AddParameter("@Purpose", Purpose);
             this.m_db.AddParameter("@FLocation", FLocation);
             this.m_db.AddParameter("@Journey", Journey);
-            this.m_db.AddParameter("@BTime", BTime);
+            this.m_db.AddParameter("@Time", Time);
+            this.m_db.AddParameter("@STime", STime);
             this.m_db.AddParameter("@ETime", ETime);
             this.m_db.AddParameter("@Days", Days);
             this.m_db.AddParameter("@TransportType", TransportType);
             this.m_db.AddParameter("@ApplyCar", ApplyCar);
             this.m_db.AddParameter("@Remark", Remark);
-            this.m_db.AddParameter("@Departurejourney", Departurejourney);
-            this.m_db.AddParameter("@Journeyends", Journeyends);
             this.m_db.AddParameter("@flowflag", "N");
             this.m_db.AddParameter("@USERID", UserID);
             this.m_db.AddParameter("@DepID", DepID);
@@ -275,14 +251,14 @@ namespace LYV.BusinessTrip.PO
 
             this.m_db.Dispose();
         }
-        internal void UpdateFormStatus(string LYV, string Area, string MaPhieu,string EmployeeType, string SiteCode, string signStatus, XElement xE)
+        internal void UpdateFormStatus(string LYV, string Area, string MaPhieu,string EmployeeType, string DepID, string UserID, string SiteCode, string signStatus, XElement xE)
         {
-            DataTable dt = new DataTable();
-
+            string conn = Training.Properties.Settings.Default.UOF.ToString();
             this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(conn);
 
-            string cmdflowflag = @"SELECT flowflag FROM LYV_BusinessTrip WHERE LYV_TDC = @LYV";
+            string cmdflowflag = @"SELECT flowflag FROM LYV_BusinessTripOD WHERE LYV_TSS = @LYV";
 
+            DataTable dt = new DataTable();
             this.m_db.AddParameter("@LYV", LYV);
             dt.Load(this.m_db.ExecuteReader(cmdflowflag));
 
@@ -290,10 +266,9 @@ namespace LYV.BusinessTrip.PO
 
             if ((flowflag == "NP" || flowflag == "N") && SiteCode != "ReturnToApplicant")
             {
-                string Expert = xE.Attribute("Expert").Value;
-                string Factory = xE.Attribute("Factory").Value;
-                string Work = xE.Attribute("Work").Value;
                 string Name_ID = xE.Attribute("Name_ID").Value;
+                string Expert = xE.Attribute("Expert").Value;
+                string Factory = xE.Attribute("Factory").Value; 
                 string Name = xE.Attribute("Name").Value;
                 string Name_DepID = xE.Attribute("Name_DepID").Value;
                 string Name_DepName = xE.Attribute("Name_DepName").Value;
@@ -302,22 +277,20 @@ namespace LYV.BusinessTrip.PO
                 string Purpose = xE.Attribute("Purpose").Value;
                 string FLocation = xE.Attribute("FLocation").Value;
                 string Journey = xE.Attribute("Journey").Value;
-                string BTime = xE.Attribute("BTime").Value;
+                string Time = xE.Attribute("Time").Value;
+                string STime = xE.Attribute("STime").Value;
                 string ETime = xE.Attribute("ETime").Value;
                 string Days = xE.Attribute("Days").Value;
                 string TransportType = xE.Attribute("TransportType").Value;
                 string ApplyCar = xE.Attribute("ApplyCar").Value;
                 string Remark = xE.Attribute("Remark").Value;
-                string Departurejourney = xE.Attribute("Departurejourney").Value;
-                string Journeyends = xE.Attribute("Journeyends").Value;
 
-                string cmdTxt = @"  UPDATE LYV_BusinessTrip SET
+                string cmdTxt = @"  UPDATE LYV_BusinessTripOD SET
                                      [Area] = @Area,
                                      [MaPhieu] = @MaPhieu,
                                      [Expert] = @Expert,
                                      [Factory] = @Factory,
                                      [EmployeeType] = @EmployeeType,
-                                     [Work] = @Work,
                                      [Name_ID] = @Name_ID,
                                      [Name] = @Name,
                                      [Name_DepID] = @Name_DepID,
@@ -326,17 +299,16 @@ namespace LYV.BusinessTrip.PO
                                      [Purpose] = @Purpose,
                                      [FLocation] = @FLocation,
                                      [Journey] = @Journey,
-                                     [BTime] = @BTime,
-                                     [ETime] = " + (string.IsNullOrEmpty(ETime) ? "NULL" : "@ETime") + @",
-                                     [Days] = " + (string.IsNullOrEmpty(Days) ? "NULL" : "@Days") + @",
+                                     [Time] = @Time,
+                                     [STime] = @STime,
+                                     [ETime] = @ETime,
+                                     [Days] = @Days,
                                      [TransportType] = " + (string.IsNullOrEmpty(TransportType) ? "NULL" : "@TransportType") + @",
                                      [ApplyCar] = @ApplyCar,
                                      [Remark] = @Remark,
-                                     [Departurejourney] = @Departurejourney,
-                                     [Journeyends] = @Journeyends,
                                      [flowflag] = @flowflag
                                  WHERE
-                                     LYV_TDC=@LYV
+                                     LYV_TSS=@LYV
                                      ";
 
                 this.m_db.AddParameter("@LYV", LYV);
@@ -345,7 +317,6 @@ namespace LYV.BusinessTrip.PO
                 this.m_db.AddParameter("@Expert", Expert);
                 this.m_db.AddParameter("@Factory", Factory);
                 this.m_db.AddParameter("@EmployeeType", EmployeeType);
-                this.m_db.AddParameter("@Work", Work);
                 this.m_db.AddParameter("@Name_ID", Name_ID);
                 this.m_db.AddParameter("@Name", Name);
                 this.m_db.AddParameter("@Name_DepID", Name_DepID);
@@ -355,40 +326,39 @@ namespace LYV.BusinessTrip.PO
                 this.m_db.AddParameter("@Purpose", Purpose);
                 this.m_db.AddParameter("@FLocation", FLocation);
                 this.m_db.AddParameter("@Journey", Journey);
-                this.m_db.AddParameter("@BTime", BTime);
+                this.m_db.AddParameter("@Time", Time);
+                this.m_db.AddParameter("@STime", STime);
                 this.m_db.AddParameter("@ETime", ETime);
                 this.m_db.AddParameter("@Days", Days);
                 this.m_db.AddParameter("@TransportType", TransportType);
                 this.m_db.AddParameter("@ApplyCar", ApplyCar);
                 this.m_db.AddParameter("@Remark", Remark);
-                this.m_db.AddParameter("@Departurejourney", Departurejourney);
-                this.m_db.AddParameter("@Journeyends", Journeyends);
                 this.m_db.AddParameter("@flowflag", "N");
 
                 this.m_db.ExecuteNonQuery(cmdTxt);
 
                 if (!string.IsNullOrEmpty(SiteCode))
                 {
-                    string cmdTxt1 = "UPDATE LYV_BusinessTrip SET flowflag = 'P' WHERE LYV_TDC = @LYV ";
+                    string cmdTxt1 = "UPDATE LYV_BusinessTripOD SET flowflag = 'P' WHERE LYV_TSS = @LYV ";
                     this.m_db.AddParameter("@LYV", LYV);
                     this.m_db.ExecuteNonQuery(cmdTxt1);
                 }
             }
             if (SiteCode == "ReturnToApplicant")
             {
-                string cmdTxt = "UPDATE LYV_BusinessTrip SET flowflag = 'NP' WHERE LYV_TDC = @LYV ";
+                string cmdTxt = "UPDATE LYV_BusinessTripOD SET flowflag = 'NP' WHERE LYV_TSS = @LYV ";
                 this.m_db.AddParameter("@LYV", LYV);
                 this.m_db.ExecuteNonQuery(cmdTxt);
             }
             else if (SiteCode == "GD" && signStatus == "Approve" || SiteCode == "CNBP" && signStatus == "Approve")
             {
-                string cmdTxt = @"UPDATE LYV_BusinessTrip SET flowflag='Z' WHERE LYV_TDC = @LYV AND flowflag IN ('N','P')";
+                string cmdTxt = @"UPDATE LYV_BusinessTripOD SET flowflag='Z' WHERE LYV_TSS = @LYV AND flowflag IN ('N','P')";
                 this.m_db.AddParameter("@LYV", LYV);
                 this.m_db.ExecuteNonQuery(cmdTxt);
             }
             else if (signStatus == "Disapprove")
             {
-                string cmdTxt = @"UPDATE LYV_BusinessTrip SET flowflag='X' WHERE LYV_TDC = @LYV ";
+                string cmdTxt = @"UPDATE LYV_BusinessTripOD SET flowflag='X' WHERE LYV_TSS = @LYV ";
                 this.m_db.AddParameter("@LYV", LYV);
                 this.m_db.ExecuteNonQuery(cmdTxt);
             }
@@ -397,17 +367,18 @@ namespace LYV.BusinessTrip.PO
         }
         internal void UpdateFormResult(string LYV, string formResult)
         {
-            this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(conn);
+            string conn1 = Training.Properties.Settings.Default.UOF.ToString();
+            this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(conn1);
 
             if (formResult == "Adopt")
             {
-                string cmdTxt = @"UPDATE LYV_BusinessTrip SET flowflag='Z' WHERE LYV_TDC = @LYV AND flowflag IN ('N','P')";
+                string cmdTxt = @"UPDATE LYV_BusinessTripOD SET flowflag='Z' WHERE LYV_TSS = @LYV AND flowflag IN ('N','P')";
                 this.m_db.AddParameter("@LYV", LYV);
                 this.m_db.ExecuteNonQuery(cmdTxt);
             }
             else if (formResult == "Reject" || formResult == "Cancel")
             {
-                string cmdTxt = @"UPDATE LYV_BusinessTrip SET flowflag='X' WHERE LYV_TDC = @LYV ";
+                string cmdTxt = @"UPDATE LYV_BusinessTripOD SET flowflag='X' WHERE LYV_TSS = @LYV ";
                 this.m_db.AddParameter("@LYV", LYV);
                 this.m_db.ExecuteNonQuery(cmdTxt);
             }
@@ -417,10 +388,11 @@ namespace LYV.BusinessTrip.PO
         internal DataTable getWSSignNextInfo(string docNbr, string UserGUID)
         {
             DataTable dt = new DataTable();
+            string conn = Training.Properties.Settings.Default.UOF.ToString();
             this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(conn);
             string cmdTxt = @"SELECT TB_WKF_TASK.TASK_ID, TB_WKF_TASK_NODE.SITE_ID, TB_WKF_TASK_NODE.NODE_SEQ, TB_WKF_TASK_NODE.ORIGINAL_SIGNER
-                            FROM TB_WKF_TASK INNER JOIN TB_WKF_TASK_NODE ON TB_WKF_TASK.TASK_ID = TB_WKF_TASK_NODE.TASK_ID
-                            WHERE DOC_NBR=@DOC_NBR AND TB_WKF_TASK_NODE.ORIGINAL_SIGNER=@ORIGINAL_SIGNER AND TB_WKF_TASK_NODE.FINISH_TIME IS NULL";
+                              FROM TB_WKF_TASK INNER JOIN TB_WKF_TASK_NODE ON TB_WKF_TASK.TASK_ID = TB_WKF_TASK_NODE.TASK_ID
+                              WHERE DOC_NBR=@DOC_NBR AND TB_WKF_TASK_NODE.ORIGINAL_SIGNER=@ORIGINAL_SIGNER AND TB_WKF_TASK_NODE.FINISH_TIME IS NULL";
             m_db.AddParameter("@DOC_NBR", docNbr);
             m_db.AddParameter("@ORIGINAL_SIGNER", UserGUID);
 
@@ -430,54 +402,21 @@ namespace LYV.BusinessTrip.PO
 
             return dt;
         }
-        internal DataTable GetListBT(string LYV, string Type, string RLYV, string Name, string Name_ID, string BTime1, string BTime2)
+        internal DataTable GetListBT(string LYV, string Name, string Name_ID, string Time1, string Time2)
         {
+            string conn = Training.Properties.Settings.Default.UOF.ToString();
             this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(conn);
             string where = "";
-            if (Type != "ALL")
-            {
-                where += " and Work = N'" + Type + "' ";
-            }
-            if (LYV != "") where += " and LOWER(LYV_TDC) like LOWER('%" + LYV + "%') ";
-            if (RLYV != "") where += " and LOWER(RLYV) like LOWER('%" + RLYV + "%') ";
+            if (LYV != "") where += " and LOWER(LYV_TSS) like LOWER('%" + LYV + "%') ";
             if (Name != "") where += " and LOWER(Name) like LOWER(N'%" + Name + "%') ";
             if (Name_ID != "") where += " and Name_ID like '" + Name_ID + "%' ";
-            if (BTime1 != "") where += " and BTime >= '" + BTime1 + "' ";
-            if (BTime2 != "") where += " and BTime <= '" + BTime2 + "' ";
+            if (Time1 != "") where += " and Time >= '" + Time1 + "' ";
+            if (Time2 != "") where += " and Time <= '" + Time2 + "' ";
 
-            string SQL1 = @" SELECT * FROM( 
-                        SELECT LYV_BusinessTrip.LYV_TDC, LYV_BusinessTripReport.LYV RLYV, LYV_BusinessTrip.Name, Name_ID, Purpose, FLocation, 
-                        CONVERT(varchar,BTime,120) BTime, CONVERT(varchar,ETime,120) ETime, LYV_BusinessTrip.USERID, CONVERT(varchar,LYV_BusinessTrip.USERDATE,120) USERDATE, LYV_BusinessTrip.flowflag, 
-                        case when Type=N'Trong nước' THEN 'V' else 'F' end as Type, isnull(Days,2) Days, TB_WKF_TASK.TASK_ID, TB_WKF_TASK_Report.TASK_ID RTASK_ID 
-                        FROM LYV_BusinessTrip 
-                        LEFT JOIN TB_WKF_TASK on LYV_BusinessTrip.LYV_TDC=TB_WKF_TASK.DOC_NBR 
-                        LEFT JOIN LYV_BusinessTripReport on LYV_BusinessTrip.LYV_TDC=LYV_BusinessTripReport.RLYV 
-                        LEFT JOIN TB_WKF_TASK TB_WKF_TASK_Report on LYV_BusinessTripReport.LYV=TB_WKF_TASK_Report.DOC_NBR 
-                        where isnull(LYV_BusinessTripReport.Cancel,0) <> 1
-                        /*
-                        union all 
-                        SELECT LYV, '' RLYV, Name, Name_ID, Purpose, FLocation, 
-                        CONVERT(varchar,CAST(CONVERT(varchar, Time, 23) + ' ' + isnull(STime,'00:00') AS smalldatetime),120)  AS BTime, 
-                        CONVERT(varchar,CAST(CONVERT(varchar, Time, 23) + ' ' + isnull(ETime,'00:00') AS smalldatetime),120) AS ETime, 
-                        USERID, CONVERT(varchar,USERDATE,120) USERDATE, flowflag, 'O' Type, Days, TASK_ID, '' RTASK_ID 
-                        FROM LYV_BusinessTripOD 
-                        LEFT JOIN TB_WKF_TASK on LYV_BusinessTripOD.LYV_TSS=TB_WKF_TASK.DOC_NBR 
-                        */
-                    )AS BT 
-                    WHERE 1=1" + where + @"
-                    ORDER BY BT.LYV desc ";
-
-            string SQL = @" SELECT * FROM( 
-                        SELECT LYV_BusinessTrip.LYV_TDC, LYV_BusinessTrip.Name, Name_ID, Purpose, FLocation,TB_WKF_TASK.TASK_ID,
-                        CONVERT(varchar,BTime,120) BTime, CONVERT(varchar,ETime,120) ETime, LYV_BusinessTrip.USERID, CONVERT(varchar,LYV_BusinessTrip.USERDATE,120) USERDATE, LYV_BusinessTrip.flowflag, 
-                        Work, isnull(Days,2) Days
-                        FROM LYV_BusinessTrip 
-                        LEFT JOIN TB_WKF_TASK on LYV_BusinessTrip.LYV_TDC=TB_WKF_TASK.DOC_NBR
-                        LEFT JOIN TB_WKF_TASK TB_WKF_TASK_Report on LYV_BusinessTrip.LYV_TDC=TB_WKF_TASK_Report.DOC_NBR
-                    )AS BT 
-                    WHERE 1=1" + where + @"
-                    ORDER BY BT.LYV_TDC desc ";
-
+            string SQL = @"SELECT LYV_TSS, Name, Name_ID, Purpose, FLocation, Time, USERID, USERDATE, flowflag, TASK_ID 
+                           FROM LYV_BusinessTripOD LEFT JOIN TB_WKF_TASK on LYV_BusinessTripOD.LYV_TSS=TB_WKF_TASK.DOC_NBR 
+                           WHERE 1=1" + where + @"
+                           ORDER BY LYV_BusinessTripOD.LYV_TSS desc ";
             DataTable dt = new DataTable();
             dt.Load(this.m_db.ExecuteReader(SQL));
 
@@ -486,29 +425,12 @@ namespace LYV.BusinessTrip.PO
             return dt;
         }
 
-        internal string GetType(string LYV)
-        {
-            this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(conn);
-            string SQL = @"SELECT Work FROM dbo.LYV_BusinessTrip WHERE LYV_TDC = @LYV";
-
-            DataTable dt = new DataTable();
-            this.m_db.AddParameter("@LYV", LYV);
-            dt.Load(this.m_db.ExecuteReader(SQL));
-            this.m_db.Dispose();
-
-            string Type = "";
-            if (dt.Rows.Count > 0)
-            {
-                Type = dt.Rows[0][0].ToString(); //請假人工號
-            }
-            return Type;
-          
-        }
         internal string getFlowflag(string LYV)
         {
 
+            string conn = Training.Properties.Settings.Default.UOF.ToString();
             this.m_db = new Ede.Uof.Utility.Data.DatabaseHelper(conn);
-            string cmdflowflag = @"SELECT flowflag FROM dbo.LYV_BusinessTrip WHERE LYV_TDC = @LYV";
+            string cmdflowflag = @"SELECT flowflag FROM dbo.LYV_BusinessTripOD WHERE LYV_TSS = @LYV";
 
             DataTable dt = new DataTable();
             this.m_db.AddParameter("@LYV", LYV);
@@ -521,6 +443,5 @@ namespace LYV.BusinessTrip.PO
             return flowflag;
 
         }
-
     }
 }

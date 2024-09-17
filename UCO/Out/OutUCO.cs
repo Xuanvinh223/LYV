@@ -1,8 +1,8 @@
 ﻿using System.Data;
 using System.Xml.Linq;
-using Training.LYVOut.PO;
+using LYV.Out.PO;
 
-namespace Training.Out.UCO
+namespace LYV.Out.UCO
 {
     public class OutUCO
     {
@@ -27,6 +27,11 @@ namespace Training.Out.UCO
         public DataTable GetListOut(string D_STEP_DESC, string Type, string LNO, string OutID, string LeaveTime, string ReturnTime, string UserDate1, string UserDate2, string OutCheck, string UserID)
         {
             return m_OutPO.GetListOut(D_STEP_DESC, Type, LNO, OutID, LeaveTime, ReturnTime, UserDate1, UserDate2, OutCheck, UserID);
+        }
+
+        public string GetLNO()
+        {
+            return m_OutPO.GetLNO();
         }
     }
 }

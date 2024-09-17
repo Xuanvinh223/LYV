@@ -7,7 +7,7 @@ namespace LYV.BusinessTripOD.UCO
 {
     public  class BusinessTripODUCO
     {
-        BusinessTripODPO m_BusinessTripODPO = new BusinessTripODPO();
+        PO.BusinessTripOD m_BusinessTripODPO = new PO.BusinessTripOD();
 
         public string GetLEV(string UserID, string groupID)
         {
@@ -25,13 +25,13 @@ namespace LYV.BusinessTripOD.UCO
         {
             return m_BusinessTripODPO.GetEmployee(UserID);
         }
-        public void InsertBusinessTripODFormData(string LYV, string EmployeeType, string RequestDate, string Type, string DepID, string UserID, XElement xE)
+        public void InsertBusinessTripODFormData(string LYV, string Area, string MaPhieu, string EmployeeType, string DepID, string UserID, XElement xE)
         {
-            m_BusinessTripODPO.InsertBusinessTripODFormData(LYV,EmployeeType,RequestDate,Type,DepID,UserID,xE);
+            m_BusinessTripODPO.InsertBusinessTripODFormData(LYV, Area, MaPhieu,EmployeeType, DepID,UserID,xE);
         }
-        public void UpdateFormStatus(string LYV, string EmployeeType, string RequestDate, string Type, string DepID, string UserID, string SiteCode, string signStatus, XElement xE)
+        public void UpdateFormStatus(string LYV, string Area, string MaPhieu,string EmployeeType, string DepID, string UserID, string SiteCode, string signStatus, XElement xE)
         {
-            m_BusinessTripODPO.UpdateFormStatus( LYV,  EmployeeType,  RequestDate,  Type,  DepID,  UserID,  SiteCode,  signStatus,  xE);
+            m_BusinessTripODPO.UpdateFormStatus( LYV, Area, MaPhieu,EmployeeType, DepID,  UserID,  SiteCode,  signStatus,  xE);
         }
 
         public void UpdateFormResult(string LNO, string formResult)
